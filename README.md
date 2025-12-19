@@ -106,6 +106,57 @@ $direct = Dotapay::settlements()->withdrawDirect([
   'account_number' => '0123456789',
   'reference' => 'WD-'.now()->timestamp,
 ]);
+
+/**
+ * Customer-scoped withdrawals
+ * $identifier can be customer id / code / reference (same pattern as customers()->show())
+ */
+
+// Customer -> settlement bank (uses customer context)
+$customerWithdraw = Dotapay::settlements()->withdrawCustomer('my-app-user-123', [
+  'amount' => 5000,
+  'settlement_bank_id' => 'SETTBANK_...',
+  // 'reference' => 'CWD-'.now()->timestamp,
+]);
+
+// Customer -> bank account (direct)
+$customerDirect = Dotapay::settlements()->withdrawDirectCustomer('my-app-user-123', [
+  'amount' => 5000,
+  'bank_code' => '058',
+  'account_number' => '0123456789',
+  'reference' => 'CWD-'.now()->timestamp,
+]);
+
+/**
+ * Customer wallet transfer (customer -> wallet)
+ * Useful when you want to move funds from a customer's wallet to another wallet (e.g. business wallet)
+ */
+$customerWalletTransfer = Dotapay::settlements()->withdrawCustomerWallet('my-app-user-123', [
+  'amount' => 5000,
+  'wallet_id' => 'DEST_WALLET_live', // destination wallet slug/id (as required by your API)
+  'reference' => 'CWT-'.now()->timestamp,
+]);
+
+/**
+ * Bulk direct withdrawals
+ */
+$bulk = Dotapay::settlements()->withdrawDirectBulk([
+  'wallet_id' => 'WALLET_ABC_live',
+  'items' => [
+    [
+      'amount' => 5000,
+      'bank_code' => '058',
+      'account_number' => '0123456789',
+      'reference' => 'WD-'.now()->timestamp.'-1',
+    ],
+    [
+      'amount' => 7500,
+      'bank_code' => '011',
+      'account_number' => '0001112223',
+      'reference' => 'WD-'.now()->timestamp.'-2',
+    ],
+  ],
+]);
 ```
 
 ## Multi-merchant platforms
