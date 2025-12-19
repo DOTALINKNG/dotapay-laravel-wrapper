@@ -14,9 +14,9 @@ class SettlementsClient extends BaseClient
         return $this->post('settlements/withdraw', $payload);
     }
 
-    public function withdrawCustomer(array $payload): array
+    public function withdrawCustomer($identifier, array $payload): array
     {
-        return $this->post('settlements/withdraw-customer', $payload);
+        return $this->post("settlements/customers/{$identifier}/withdraw", $payload);
     }
 
     public function withdrawDirect(array $payload): array
@@ -24,9 +24,14 @@ class SettlementsClient extends BaseClient
         return $this->post('settlements/withdraw-direct', $payload);
     }
 
-    public function withdrawDirectCustomer(array $payload): array
+    public function withdrawDirectCustomer($identifier, array $payload): array
     {
-        return $this->post('settlements/withdraw-direct-customer', $payload);
+        return $this->post("settlements/customers/{$identifier}/withdraw-direct", $payload);
+    }
+
+    public function withdrawCustomerWallet($identifier, array $payload): array
+    {
+        return $this->post("settlements/customers/{$identifier}/transfer-wallet", $payload);
     }
 
     public function withdrawDirectBulk(array $payload): array
