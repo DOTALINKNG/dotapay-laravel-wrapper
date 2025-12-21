@@ -33,37 +33,62 @@ class CustomersClient extends BaseClient
     }
 
     /**
-     * Create customer, but if the reference already exists, return that customer via show(reference).
+     * Create customer, but if customer already exists (duplicate email OR reference),
+     * return the existing customer via show(identifier).
      *
-     * This is useful for idempotent onboarding.
+     * show() accepts either reference or email.
      */
-    public function createOrGetByReference(array $payload): array
+    public function createOrGet(array $payload): array
     {
-        $reference = $payload['reference'] ?? null;
-        if (!is_string($reference) || $reference === '') {
-            // Let create() throw a validation error from the API
-            return $this->create($payload);
-        }
+        $reference = isset($payload['reference']) ? trim((string) $payload['reference']) : '';
+        $email     = isset($payload['email']) ? trim((string) $payload['email']) : '';
 
+        // prefer email when the API complains about email, otherwise reference
         try {
             return $this->create($payload);
         } catch (DotapayRequestException $e) {
-            $msg = strtolower($e->getMessage());
+            $msg = strtolower((string) $e->getMessage());
 
-            $looksLikeDuplicateRef = (
-                $e->status === 422 || $e->status === 400
-            ) && (
-                str_contains($msg, 'reference') && str_contains($msg, 'exist')
-            );
+            $looksLikeDuplicate = in_array((int) $e->status, [400, 409, 422, 500], true)
+                && (
+                    str_contains($msg, 'already exists') ||
+                    str_contains($msg, 'already exist') ||
+                    str_contains($msg, 'duplicate') ||
+                    (str_contains($msg, 'exist') && (str_contains($msg, 'email') || str_contains($msg, 'reference')))
+                );
 
-            if (!$looksLikeDuplicateRef) {
+            if (! $looksLikeDuplicate) {
                 throw $e;
             }
 
-            // Pull existing customer using the same identifier your API supports.
-            return $this->show($reference);
+            // If message points to email, try email first
+            $preferEmail = str_contains($msg, 'email');
+
+            $candidates = array_values(array_filter([
+                $preferEmail ? $email : $reference,
+                $preferEmail ? $reference : $email,
+            ], fn($v) => is_string($v) && $v !== ''));
+
+            if (empty($candidates)) {
+                // nothing to recover with, bubble up original
+                throw $e;
+            }
+
+            // Try show() with whichever identifier works (email or reference)
+            $last = null;
+            foreach ($candidates as $id) {
+                try {
+                    return $this->show($id);
+                } catch (DotapayRequestException $ex) {
+                    $last = $ex;
+                }
+            }
+
+            // If all recovery attempts failed, throw the last error (or original)
+            throw $last ?? $e;
         }
     }
+
 
     public function balance(string|int $identifier): array
     {
