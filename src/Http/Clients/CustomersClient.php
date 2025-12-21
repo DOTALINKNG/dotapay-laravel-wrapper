@@ -38,7 +38,7 @@ class CustomersClient extends BaseClient
      *
      * show() accepts either reference or email.
      */
-    public function createOrGet(array $payload): array
+    public function createOrGetByReference(array $payload): array
     {
         $reference = isset($payload['reference']) ? trim((string) $payload['reference']) : '';
         $email     = isset($payload['email']) ? trim((string) $payload['email']) : '';
