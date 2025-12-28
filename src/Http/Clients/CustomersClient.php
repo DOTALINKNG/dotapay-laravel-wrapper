@@ -25,6 +25,14 @@ class CustomersClient extends BaseClient
     }
 
     /**
+     * Create an individual customer updates if customer already exist.
+     */
+    public function createOrUpdate(array $payload): array
+    {
+        return $this->post('customers/storeorupdate', $payload);
+    }
+
+    /**
      * Create a corporate customer (fails if email/reference already exists).
      */
     public function createCorporate(array $payload): array
@@ -45,7 +53,7 @@ class CustomersClient extends BaseClient
 
         // prefer email when the API complains about email, otherwise reference
         try {
-            return $this->create($payload);
+            return $this->createOrUpdate($payload);
         } catch (DotapayRequestException $e) {
             $msg = strtolower((string) $e->getMessage());
 
