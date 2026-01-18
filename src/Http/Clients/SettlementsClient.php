@@ -2,40 +2,128 @@
 
 namespace DotaPay\LaravelSdk\Http\Clients;
 
+use DotaPay\LaravelSdk\Data\Settlements\SettlementCollection;
+use DotaPay\LaravelSdk\Data\Settlements\WithdrawalResponse;
+
 class SettlementsClient extends BaseClient
 {
-    public function index(array $query = []): array
+    /**
+     * List all settlements.
+     *
+     * @param array{
+     *     page?: int,
+     *     per_page?: int,
+     *     status?: string,
+     *     type?: string,
+     *     from?: string,
+     *     to?: string,
+     * } $query
+     */
+    public function index(array $query = []): SettlementCollection
     {
-        return $this->get('settlements', $query);
+        return SettlementCollection::fromArray($this->get('settlements', $query));
     }
 
-    public function withdraw(array $payload): array
+    /**
+     * Withdraw from the main wallet.
+     *
+     * @param array{
+     *     amount: int|float,
+     *     bank_code: string,
+     *     account_number: string,
+     *     reference?: string,
+     *     narration?: string,
+     *     meta?: array<string, mixed>,
+     * } $payload
+     */
+    public function withdraw(array $payload): WithdrawalResponse
     {
-        return $this->post('settlements/withdraw', $payload);
+        return WithdrawalResponse::fromArray($this->post('settlements/withdraw', $payload));
     }
 
-    public function withdrawCustomer($identifier, array $payload): array
+    /**
+     * Withdraw from a customer's wallet.
+     *
+     * @param array{
+     *     amount: int|float,
+     *     bank_code: string,
+     *     account_number: string,
+     *     reference?: string,
+     *     narration?: string,
+     *     meta?: array<string, mixed>,
+     * } $payload
+     */
+    public function withdrawCustomer(string|int $identifier, array $payload): WithdrawalResponse
     {
-        return $this->post("settlements/customers/{$identifier}/withdraw", $payload);
+        return WithdrawalResponse::fromArray($this->post("settlements/customers/{$identifier}/withdraw", $payload));
     }
 
-    public function withdrawDirect(array $payload): array
+    /**
+     * Withdraw directly from the main wallet (instant settlement).
+     *
+     * @param array{
+     *     amount: int|float,
+     *     bank_code: string,
+     *     account_number: string,
+     *     reference?: string,
+     *     narration?: string,
+     *     meta?: array<string, mixed>,
+     * } $payload
+     */
+    public function withdrawDirect(array $payload): WithdrawalResponse
     {
-        return $this->post('settlements/withdraw-direct', $payload);
+        return WithdrawalResponse::fromArray($this->post('settlements/withdraw-direct', $payload));
     }
 
-    public function withdrawDirectCustomer($identifier, array $payload): array
+    /**
+     * Withdraw directly from a customer's wallet (instant settlement).
+     *
+     * @param array{
+     *     amount: int|float,
+     *     bank_code: string,
+     *     account_number: string,
+     *     reference?: string,
+     *     narration?: string,
+     *     meta?: array<string, mixed>,
+     * } $payload
+     */
+    public function withdrawDirectCustomer(string|int $identifier, array $payload): WithdrawalResponse
     {
-        return $this->post("settlements/customers/{$identifier}/withdraw-direct", $payload);
+        return WithdrawalResponse::fromArray($this->post("settlements/customers/{$identifier}/withdraw-direct", $payload));
     }
 
-    public function withdrawCustomerWallet($identifier, array $payload): array
+    /**
+     * Transfer from a customer's wallet to another wallet.
+     *
+     * @param array{
+     *     amount: int|float,
+     *     destination_wallet: string,
+     *     reference?: string,
+     *     narration?: string,
+     *     meta?: array<string, mixed>,
+     * } $payload
+     */
+    public function withdrawCustomerWallet(string|int $identifier, array $payload): WithdrawalResponse
     {
-        return $this->post("settlements/customers/{$identifier}/transfer-wallet", $payload);
+        return WithdrawalResponse::fromArray($this->post("settlements/customers/{$identifier}/transfer-wallet", $payload));
     }
 
-    public function withdrawDirectBulk(array $payload): array
+    /**
+     * Bulk withdraw directly (instant settlement to multiple accounts).
+     *
+     * @param array{
+     *     transfers: array<array{
+     *         amount: int|float,
+     *         bank_code: string,
+     *         account_number: string,
+     *         reference?: string,
+     *         narration?: string,
+     *     }>,
+     *     meta?: array<string, mixed>,
+     * } $payload
+     */
+    public function withdrawDirectBulk(array $payload): WithdrawalResponse
     {
-        return $this->post('settlements/withdraw-direct-bulk', $payload);
+        return WithdrawalResponse::fromArray($this->post('settlements/withdraw-direct-bulk', $payload));
     }
 }

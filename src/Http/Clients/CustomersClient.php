@@ -2,42 +2,101 @@
 
 namespace DotaPay\LaravelSdk\Http\Clients;
 
+use DotaPay\LaravelSdk\Data\Customers\Customer;
+use DotaPay\LaravelSdk\Data\Customers\CustomerBalance;
+use DotaPay\LaravelSdk\Data\Customers\CustomerCollection;
+use DotaPay\LaravelSdk\Data\Customers\TransactionCollection;
+use DotaPay\LaravelSdk\Data\Customers\VirtualAccount;
 use DotaPay\LaravelSdk\Exceptions\DotapayRequestException;
 
 class CustomersClient extends BaseClient
 {
-    public function index(array $query = []): array
+    /**
+     * List all customers.
+     *
+     * @param array{
+     *     page?: int,
+     *     per_page?: int,
+     *     search?: string,
+     *     type?: 'wallet'|'collection',
+     *     status?: string,
+     * } $query
+     */
+    public function index(array $query = []): CustomerCollection
     {
-        return $this->get('customers', $query);
+        return CustomerCollection::fromArray($this->get('customers', $query));
     }
 
-    public function show(string|int $identifier, array $query = []): array
+    /**
+     * Get a single customer by identifier (ID, code, reference, or email).
+     *
+     * @param array{
+     *     include?: string,
+     * } $query
+     */
+    public function show(string|int $identifier, array $query = []): Customer
     {
-        return $this->get("customers/{$identifier}", $query);
+        return Customer::fromArray($this->get("customers/{$identifier}", $query));
     }
 
     /**
      * Create an individual customer (fails if email/reference already exists).
+     *
+     * @param array{
+     *     first_name: string,
+     *     last_name: string,
+     *     bvn: string,
+     *     dob: string,
+     *     email: string,
+     *     reference: string,
+     *     type: 'wallet'|'collection',
+     *     nin?: string,
+     *     phone?: string,
+     *     collection_wallet?: string,
+     * } $payload
      */
-    public function create(array $payload): array
+    public function create(array $payload): Customer
     {
-        return $this->post('customers', $payload);
+        return Customer::fromArray($this->post('customers', $payload));
     }
 
     /**
-     * Create an individual customer updates if customer already exist.
+     * Create an individual customer, updates if customer already exists.
+     *
+     * @param array{
+     *     first_name: string,
+     *     last_name: string,
+     *     bvn: string,
+     *     dob: string,
+     *     email: string,
+     *     reference: string,
+     *     type: 'wallet'|'collection',
+     *     nin?: string,
+     *     phone?: string,
+     *     collection_wallet?: string,
+     * } $payload
      */
-    public function createOrUpdate(array $payload): array
+    public function createOrUpdate(array $payload): Customer
     {
-        return $this->post('customers/storeorupdate', $payload);
+        return Customer::fromArray($this->post('customers/storeorupdate', $payload));
     }
 
     /**
      * Create a corporate customer (fails if email/reference already exists).
+     *
+     * @param array{
+     *     company_name: string,
+     *     rc_number: string,
+     *     email: string,
+     *     reference: string,
+     *     type: 'wallet'|'collection',
+     *     phone?: string,
+     *     collection_wallet?: string,
+     * } $payload
      */
-    public function createCorporate(array $payload): array
+    public function createCorporate(array $payload): Customer
     {
-        return $this->post('customers/corporate', $payload);
+        return Customer::fromArray($this->post('customers/corporate', $payload));
     }
 
     /**
@@ -45,8 +104,21 @@ class CustomersClient extends BaseClient
      * return the existing customer via show(identifier).
      *
      * show() accepts either reference or email.
+     *
+     * @param array{
+     *     first_name: string,
+     *     last_name: string,
+     *     bvn: string,
+     *     dob: string,
+     *     email: string,
+     *     reference: string,
+     *     type: 'wallet'|'collection',
+     *     nin?: string,
+     *     phone?: string,
+     *     collection_wallet?: string,
+     * } $payload
      */
-    public function createOrGetByReference(array $payload): array
+    public function createOrGetByReference(array $payload): Customer
     {
         $reference = isset($payload['reference']) ? trim((string) $payload['reference']) : '';
         $email     = isset($payload['email']) ? trim((string) $payload['email']) : '';
@@ -97,19 +169,45 @@ class CustomersClient extends BaseClient
         }
     }
 
-
-    public function balance(string|int $identifier): array
+    /**
+     * Get customer balance.
+     */
+    public function balance(string|int $identifier): CustomerBalance
     {
-        return $this->get("customers/{$identifier}/balance");
+        return CustomerBalance::fromArray($this->get("customers/{$identifier}/balance"));
     }
 
-    public function transactions(string|int $identifier, array $query = []): array
+    /**
+     * Get customer wallet transactions.
+     *
+     * @param array{
+     *     page?: int,
+     *     per_page?: int,
+     *     type?: string,
+     * } $query
+     */
+    public function transactions(string|int $identifier, array $query = []): TransactionCollection
     {
-        return $this->get("customers/{$identifier}/transactions", $query);
+        return TransactionCollection::fromArray($this->get("customers/{$identifier}/transactions", $query));
     }
 
+    /**
+     * Get customer virtual accounts.
+     *
+     * @return array<VirtualAccount>
+     */
     public function virtualAccounts(string|int $identifier): array
     {
-        return $this->get("customers/{$identifier}/virtual-accounts");
+        $response = $this->get("customers/{$identifier}/virtual-accounts");
+        $items = $response['data'] ?? $response;
+
+        if (! is_array($items)) {
+            return [];
+        }
+
+        return array_map(
+            fn (array $va) => VirtualAccount::fromArray($va),
+            $items
+        );
     }
 }

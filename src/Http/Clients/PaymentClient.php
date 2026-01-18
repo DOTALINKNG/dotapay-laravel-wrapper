@@ -2,35 +2,93 @@
 
 namespace DotaPay\LaravelSdk\Http\Clients;
 
+use DotaPay\LaravelSdk\Data\Payment\PaymentCollection;
+use DotaPay\LaravelSdk\Data\Payment\PaymentResponse;
+
 class PaymentClient extends BaseClient
 {
-    public function request(array $payload): array
+    /**
+     * Request a payment from a customer's wallet.
+     *
+     * @param array{
+     *     customer: string,
+     *     amount: int|float,
+     *     reference: string,
+     *     description?: string,
+     *     meta?: array<string, mixed>,
+     * } $payload
+     */
+    public function request(array $payload): PaymentResponse
     {
-        return $this->post('payment/request', $payload);
+        return PaymentResponse::fromArray($this->post('payment/request', $payload));
     }
 
-    public function verify(array $payload): array
+    /**
+     * Verify a payment using OTP or PIN.
+     *
+     * @param array{
+     *     reference: string,
+     *     otp?: string,
+     *     pin?: string,
+     * } $payload
+     */
+    public function verify(array $payload): PaymentResponse
     {
-        return $this->post('payment/verify', $payload);
+        return PaymentResponse::fromArray($this->post('payment/verify', $payload));
     }
 
-    public function status(string $reference): array
+    /**
+     * Get the status of a payment by reference.
+     */
+    public function status(string $reference): PaymentResponse
     {
-        return $this->get("payment/status/{$reference}");
+        return PaymentResponse::fromArray($this->get("payment/status/{$reference}"));
     }
 
-    public function list(array $query = []): array
+    /**
+     * List all payments.
+     *
+     * @param array{
+     *     page?: int,
+     *     per_page?: int,
+     *     status?: string,
+     *     customer?: string,
+     *     from?: string,
+     *     to?: string,
+     * } $query
+     */
+    public function list(array $query = []): PaymentCollection
     {
-        return $this->get('payment/list', $query);
+        return PaymentCollection::fromArray($this->get('payment/list', $query));
     }
 
-    public function initCustomer(array $payload): array
+    /**
+     * Initialize a customer payment.
+     *
+     * @param array{
+     *     customer: string,
+     *     amount: int|float,
+     *     reference: string,
+     *     description?: string,
+     *     meta?: array<string, mixed>,
+     * } $payload
+     */
+    public function initCustomer(array $payload): PaymentResponse
     {
-        return $this->post('payment/init-customer', $payload);
+        return PaymentResponse::fromArray($this->post('payment/init-customer', $payload));
     }
 
-    public function verifyCustomer(array $payload): array
+    /**
+     * Verify a customer payment.
+     *
+     * @param array{
+     *     reference: string,
+     *     otp?: string,
+     *     pin?: string,
+     * } $payload
+     */
+    public function verifyCustomer(array $payload): PaymentResponse
     {
-        return $this->post('payment/verify-customer', $payload);
+        return PaymentResponse::fromArray($this->post('payment/verify-customer', $payload));
     }
 }
