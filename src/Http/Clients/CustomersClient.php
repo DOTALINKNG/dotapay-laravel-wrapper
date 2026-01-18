@@ -2,11 +2,6 @@
 
 namespace DotaPay\LaravelSdk\Http\Clients;
 
-use DotaPay\LaravelSdk\Data\Customers\Customer;
-use DotaPay\LaravelSdk\Data\Customers\CustomerBalance;
-use DotaPay\LaravelSdk\Data\Customers\CustomerCollection;
-use DotaPay\LaravelSdk\Data\Customers\TransactionCollection;
-use DotaPay\LaravelSdk\Data\Customers\VirtualAccount;
 use DotaPay\LaravelSdk\Exceptions\DotapayRequestException;
 
 class CustomersClient extends BaseClient
@@ -21,10 +16,26 @@ class CustomersClient extends BaseClient
      *     type?: 'wallet'|'collection',
      *     status?: string,
      * } $query
+     * @return array{
+     *     data: array<array{
+     *         id: int,
+     *         code: string,
+     *         reference: string,
+     *         first_name: string,
+     *         last_name: string,
+     *         email: string,
+     *         phone: string|null,
+     *         type: string,
+     *         status: string,
+     *         wallet?: array{slug: string, balance: float, balance_kobo: int},
+     *         virtual_accounts?: array<array{bank_name: string, account_number: string, account_name: string}>,
+     *     }>,
+     *     meta: array{current_page: int, last_page: int, per_page: int, total: int},
+     * }
      */
-    public function index(array $query = []): CustomerCollection
+    public function index(array $query = []): array
     {
-        return CustomerCollection::fromArray($this->get('customers', $query));
+        return $this->get('customers', $query);
     }
 
     /**
@@ -33,10 +44,25 @@ class CustomersClient extends BaseClient
      * @param array{
      *     include?: string,
      * } $query
+     * @return array{
+     *     data: array{
+     *         id: int,
+     *         code: string,
+     *         reference: string,
+     *         first_name: string,
+     *         last_name: string,
+     *         email: string,
+     *         phone: string|null,
+     *         type: string,
+     *         status: string,
+     *         wallet?: array{slug: string, balance: float, balance_kobo: int},
+     *         virtual_accounts?: array<array{bank_name: string, account_number: string, account_name: string}>,
+     *     },
+     * }
      */
-    public function show(string|int $identifier, array $query = []): Customer
+    public function show(string|int $identifier, array $query = []): array
     {
-        return Customer::fromArray($this->get("customers/{$identifier}", $query));
+        return $this->get("customers/{$identifier}", $query);
     }
 
     /**
@@ -54,10 +80,25 @@ class CustomersClient extends BaseClient
      *     phone?: string,
      *     collection_wallet?: string,
      * } $payload
+     * @return array{
+     *     data: array{
+     *         id: int,
+     *         code: string,
+     *         reference: string,
+     *         first_name: string,
+     *         last_name: string,
+     *         email: string,
+     *         phone: string|null,
+     *         type: string,
+     *         status: string,
+     *         wallet?: array{slug: string, balance: float, balance_kobo: int},
+     *         virtual_accounts?: array<array{bank_name: string, account_number: string, account_name: string}>,
+     *     },
+     * }
      */
-    public function create(array $payload): Customer
+    public function create(array $payload): array
     {
-        return Customer::fromArray($this->post('customers', $payload));
+        return $this->post('customers', $payload);
     }
 
     /**
@@ -75,10 +116,25 @@ class CustomersClient extends BaseClient
      *     phone?: string,
      *     collection_wallet?: string,
      * } $payload
+     * @return array{
+     *     data: array{
+     *         id: int,
+     *         code: string,
+     *         reference: string,
+     *         first_name: string,
+     *         last_name: string,
+     *         email: string,
+     *         phone: string|null,
+     *         type: string,
+     *         status: string,
+     *         wallet?: array{slug: string, balance: float, balance_kobo: int},
+     *         virtual_accounts?: array<array{bank_name: string, account_number: string, account_name: string}>,
+     *     },
+     * }
      */
-    public function createOrUpdate(array $payload): Customer
+    public function createOrUpdate(array $payload): array
     {
-        return Customer::fromArray($this->post('customers/storeorupdate', $payload));
+        return $this->post('customers/storeorupdate', $payload);
     }
 
     /**
@@ -93,10 +149,25 @@ class CustomersClient extends BaseClient
      *     phone?: string,
      *     collection_wallet?: string,
      * } $payload
+     * @return array{
+     *     data: array{
+     *         id: int,
+     *         code: string,
+     *         reference: string,
+     *         first_name: string,
+     *         last_name: string,
+     *         email: string,
+     *         phone: string|null,
+     *         type: string,
+     *         status: string,
+     *         wallet?: array{slug: string, balance: float, balance_kobo: int},
+     *         virtual_accounts?: array<array{bank_name: string, account_number: string, account_name: string}>,
+     *     },
+     * }
      */
-    public function createCorporate(array $payload): Customer
+    public function createCorporate(array $payload): array
     {
-        return Customer::fromArray($this->post('customers/corporate', $payload));
+        return $this->post('customers/corporate', $payload);
     }
 
     /**
@@ -117,8 +188,23 @@ class CustomersClient extends BaseClient
      *     phone?: string,
      *     collection_wallet?: string,
      * } $payload
+     * @return array{
+     *     data: array{
+     *         id: int,
+     *         code: string,
+     *         reference: string,
+     *         first_name: string,
+     *         last_name: string,
+     *         email: string,
+     *         phone: string|null,
+     *         type: string,
+     *         status: string,
+     *         wallet?: array{slug: string, balance: float, balance_kobo: int},
+     *         virtual_accounts?: array<array{bank_name: string, account_number: string, account_name: string}>,
+     *     },
+     * }
      */
-    public function createOrGetByReference(array $payload): Customer
+    public function createOrGetByReference(array $payload): array
     {
         $reference = isset($payload['reference']) ? trim((string) $payload['reference']) : '';
         $email     = isset($payload['email']) ? trim((string) $payload['email']) : '';
@@ -171,10 +257,19 @@ class CustomersClient extends BaseClient
 
     /**
      * Get customer balance.
+     *
+     * @return array{
+     *     data: array{
+     *         name: string|null,
+     *         slug: string|null,
+     *         balance: float,
+     *         balance_kobo: int,
+     *     },
+     * }
      */
-    public function balance(string|int $identifier): CustomerBalance
+    public function balance(string|int $identifier): array
     {
-        return CustomerBalance::fromArray($this->get("customers/{$identifier}/balance"));
+        return $this->get("customers/{$identifier}/balance");
     }
 
     /**
@@ -185,29 +280,39 @@ class CustomersClient extends BaseClient
      *     per_page?: int,
      *     type?: string,
      * } $query
+     * @return array{
+     *     data: array<array{
+     *         id: int,
+     *         reference: string,
+     *         type: string,
+     *         amount: float,
+     *         amount_kobo: int,
+     *         status: string,
+     *         narration: string|null,
+     *         created_at: string,
+     *     }>,
+     *     meta: array{current_page: int, last_page: int, per_page: int, total: int},
+     * }
      */
-    public function transactions(string|int $identifier, array $query = []): TransactionCollection
+    public function transactions(string|int $identifier, array $query = []): array
     {
-        return TransactionCollection::fromArray($this->get("customers/{$identifier}/transactions", $query));
+        return $this->get("customers/{$identifier}/transactions", $query);
     }
 
     /**
      * Get customer virtual accounts.
      *
-     * @return array<VirtualAccount>
+     * @return array{
+     *     data: array<array{
+     *         bank_name: string,
+     *         bank_code: string,
+     *         account_number: string,
+     *         account_name: string,
+     *     }>,
+     * }
      */
     public function virtualAccounts(string|int $identifier): array
     {
-        $response = $this->get("customers/{$identifier}/virtual-accounts");
-        $items = $response['data'] ?? $response;
-
-        if (! is_array($items)) {
-            return [];
-        }
-
-        return array_map(
-            fn (array $va) => VirtualAccount::fromArray($va),
-            $items
-        );
+        return $this->get("customers/{$identifier}/virtual-accounts");
     }
 }

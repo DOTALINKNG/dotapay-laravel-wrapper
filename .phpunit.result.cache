@@ -1,1 +1,1 @@
-{"version":2,"defects":[],"times":{"DotaPay\\LaravelSdk\\Tests\\Feature\\FacadeTest::test_it_registers_the_dotapay_singleton":0.039}}
+{"version":2,"defects":[],"times":{"DotaPay\\LaravelSdk\\Tests\\Feature\\FacadeTest::test_it_registers_the_dotapay_singleton":0.042}}

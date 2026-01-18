@@ -2,9 +2,6 @@
 
 namespace DotaPay\LaravelSdk\Http\Clients;
 
-use DotaPay\LaravelSdk\Data\Settlements\SettlementCollection;
-use DotaPay\LaravelSdk\Data\Settlements\WithdrawalResponse;
-
 class SettlementsClient extends BaseClient
 {
     /**
@@ -18,10 +15,26 @@ class SettlementsClient extends BaseClient
      *     from?: string,
      *     to?: string,
      * } $query
+     * @return array{
+     *     data: array<array{
+     *         id: int,
+     *         code: string,
+     *         reference: string,
+     *         amount: float,
+     *         amount_kobo: int,
+     *         status: string,
+     *         type: string,
+     *         bank_code: string|null,
+     *         account_number: string|null,
+     *         account_name: string|null,
+     *         created_at: string,
+     *     }>,
+     *     meta: array{current_page: int, last_page: int, per_page: int, total: int},
+     * }
      */
-    public function index(array $query = []): SettlementCollection
+    public function index(array $query = []): array
     {
-        return SettlementCollection::fromArray($this->get('settlements', $query));
+        return $this->get('settlements', $query);
     }
 
     /**
@@ -35,10 +48,33 @@ class SettlementsClient extends BaseClient
      *     narration?: string,
      *     meta?: array<string, mixed>,
      * } $payload
+     * @return array{
+     *     data: array{
+     *         settlement?: array{
+     *             id: int,
+     *             code: string,
+     *             reference: string,
+     *             amount: float,
+     *             amount_kobo: int,
+     *             status: string,
+     *             type: string,
+     *             bank_code: string|null,
+     *             account_number: string|null,
+     *             account_name: string|null,
+     *             created_at: string,
+     *         },
+     *         id?: int,
+     *         code?: string,
+     *         reference?: string,
+     *         amount?: float,
+     *         status?: string,
+     *     },
+     *     message?: string,
+     * }
      */
-    public function withdraw(array $payload): WithdrawalResponse
+    public function withdraw(array $payload): array
     {
-        return WithdrawalResponse::fromArray($this->post('settlements/withdraw', $payload));
+        return $this->post('settlements/withdraw', $payload);
     }
 
     /**
@@ -52,10 +88,33 @@ class SettlementsClient extends BaseClient
      *     narration?: string,
      *     meta?: array<string, mixed>,
      * } $payload
+     * @return array{
+     *     data: array{
+     *         settlement?: array{
+     *             id: int,
+     *             code: string,
+     *             reference: string,
+     *             amount: float,
+     *             amount_kobo: int,
+     *             status: string,
+     *             type: string,
+     *             bank_code: string|null,
+     *             account_number: string|null,
+     *             account_name: string|null,
+     *             created_at: string,
+     *         },
+     *         id?: int,
+     *         code?: string,
+     *         reference?: string,
+     *         amount?: float,
+     *         status?: string,
+     *     },
+     *     message?: string,
+     * }
      */
-    public function withdrawCustomer(string|int $identifier, array $payload): WithdrawalResponse
+    public function withdrawCustomer(string|int $identifier, array $payload): array
     {
-        return WithdrawalResponse::fromArray($this->post("settlements/customers/{$identifier}/withdraw", $payload));
+        return $this->post("settlements/customers/{$identifier}/withdraw", $payload);
     }
 
     /**
@@ -69,10 +128,33 @@ class SettlementsClient extends BaseClient
      *     narration?: string,
      *     meta?: array<string, mixed>,
      * } $payload
+     * @return array{
+     *     data: array{
+     *         settlement?: array{
+     *             id: int,
+     *             code: string,
+     *             reference: string,
+     *             amount: float,
+     *             amount_kobo: int,
+     *             status: string,
+     *             type: string,
+     *             bank_code: string|null,
+     *             account_number: string|null,
+     *             account_name: string|null,
+     *             created_at: string,
+     *         },
+     *         id?: int,
+     *         code?: string,
+     *         reference?: string,
+     *         amount?: float,
+     *         status?: string,
+     *     },
+     *     message?: string,
+     * }
      */
-    public function withdrawDirect(array $payload): WithdrawalResponse
+    public function withdrawDirect(array $payload): array
     {
-        return WithdrawalResponse::fromArray($this->post('settlements/withdraw-direct', $payload));
+        return $this->post('settlements/withdraw-direct', $payload);
     }
 
     /**
@@ -86,10 +168,33 @@ class SettlementsClient extends BaseClient
      *     narration?: string,
      *     meta?: array<string, mixed>,
      * } $payload
+     * @return array{
+     *     data: array{
+     *         settlement?: array{
+     *             id: int,
+     *             code: string,
+     *             reference: string,
+     *             amount: float,
+     *             amount_kobo: int,
+     *             status: string,
+     *             type: string,
+     *             bank_code: string|null,
+     *             account_number: string|null,
+     *             account_name: string|null,
+     *             created_at: string,
+     *         },
+     *         id?: int,
+     *         code?: string,
+     *         reference?: string,
+     *         amount?: float,
+     *         status?: string,
+     *     },
+     *     message?: string,
+     * }
      */
-    public function withdrawDirectCustomer(string|int $identifier, array $payload): WithdrawalResponse
+    public function withdrawDirectCustomer(string|int $identifier, array $payload): array
     {
-        return WithdrawalResponse::fromArray($this->post("settlements/customers/{$identifier}/withdraw-direct", $payload));
+        return $this->post("settlements/customers/{$identifier}/withdraw-direct", $payload);
     }
 
     /**
@@ -102,10 +207,33 @@ class SettlementsClient extends BaseClient
      *     narration?: string,
      *     meta?: array<string, mixed>,
      * } $payload
+     * @return array{
+     *     data: array{
+     *         settlement?: array{
+     *             id: int,
+     *             code: string,
+     *             reference: string,
+     *             amount: float,
+     *             amount_kobo: int,
+     *             status: string,
+     *             type: string,
+     *             bank_code: string|null,
+     *             account_number: string|null,
+     *             account_name: string|null,
+     *             created_at: string,
+     *         },
+     *         id?: int,
+     *         code?: string,
+     *         reference?: string,
+     *         amount?: float,
+     *         status?: string,
+     *     },
+     *     message?: string,
+     * }
      */
-    public function withdrawCustomerWallet(string|int $identifier, array $payload): WithdrawalResponse
+    public function withdrawCustomerWallet(string|int $identifier, array $payload): array
     {
-        return WithdrawalResponse::fromArray($this->post("settlements/customers/{$identifier}/transfer-wallet", $payload));
+        return $this->post("settlements/customers/{$identifier}/transfer-wallet", $payload);
     }
 
     /**
@@ -121,9 +249,32 @@ class SettlementsClient extends BaseClient
      *     }>,
      *     meta?: array<string, mixed>,
      * } $payload
+     * @return array{
+     *     data: array{
+     *         settlement?: array{
+     *             id: int,
+     *             code: string,
+     *             reference: string,
+     *             amount: float,
+     *             amount_kobo: int,
+     *             status: string,
+     *             type: string,
+     *             bank_code: string|null,
+     *             account_number: string|null,
+     *             account_name: string|null,
+     *             created_at: string,
+     *         },
+     *         id?: int,
+     *         code?: string,
+     *         reference?: string,
+     *         amount?: float,
+     *         status?: string,
+     *     },
+     *     message?: string,
+     * }
      */
-    public function withdrawDirectBulk(array $payload): WithdrawalResponse
+    public function withdrawDirectBulk(array $payload): array
     {
-        return WithdrawalResponse::fromArray($this->post('settlements/withdraw-direct-bulk', $payload));
+        return $this->post('settlements/withdraw-direct-bulk', $payload);
     }
 }
